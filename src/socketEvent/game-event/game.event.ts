@@ -17,12 +17,16 @@ import { Server, Socket } from 'socket.io';
 import { GameService } from 'src/game/service/game.service';
 import { JoinGameService } from 'src/joingame/service/joingame.service';
 import {
+  AcceptInvite,
   createGame,
   GameServiceSocketEnum,
+  InviteGame,
   JoinGame,
   LeaveGame,
   ListGame,
+  RejectInvite,
 } from './game.enum';
+import { InviteService } from 'src/invite/service/invite.service';
 
 @WebSocketGateway({
   cors: {
@@ -38,6 +42,7 @@ export class GameServiceGateway
   constructor(
     private readonly gameService: GameService,
     private readonly joinGameService: JoinGameService,
+    private readonly inviteService: InviteService,
   ) {}
 
   @WebSocketServer()
@@ -177,6 +182,89 @@ export class GameServiceGateway
       client.emit(GameServiceSocketEnum.ERROR, error?.message);
 
       throw new WsException(`MessageServiceGateway.handleLeaveGame, ${error}`);
+    }
+  }
+
+  /// Invite ////
+
+  @SubscribeMessage(GameServiceSocketEnum.INVITE_GAME)
+  async handleInviteGame(
+    @MessageBody()
+    data: InviteGame,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const { senderId, receiverId, gameId, note } = data;
+      const invite = await this.inviteService.createInvite(
+        senderId,
+        receiverId,
+        gameId,
+        note,
+      );
+
+      client.emit(
+        GameServiceSocketEnum.GAME_INVITED,
+        JSON.stringify({
+          invite: invite,
+        }),
+      );
+    } catch (error) {
+      client.emit(GameServiceSocketEnum.ERROR, error?.message);
+
+      throw new WsException(`MessageServiceGateway.handleInviteGame, ${error}`);
+    }
+  }
+
+  @SubscribeMessage(GameServiceSocketEnum.REJECT_INVITE)
+  async handleRejectGame(
+    @MessageBody()
+    data: RejectInvite,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const { receiverId, gameId } = data;
+      const rejectInvite = await this.inviteService.rejectInvite(
+        receiverId,
+        gameId,
+      );
+
+      client.emit(
+        GameServiceSocketEnum.GAME_REJECTED,
+        JSON.stringify({
+          rejectInvite: rejectInvite,
+        }),
+      );
+    } catch (error) {
+      client.emit(GameServiceSocketEnum.ERROR, error?.message);
+
+      throw new WsException(`MessageServiceGateway.handleRejectGame, ${error}`);
+    }
+  }
+
+  @SubscribeMessage(GameServiceSocketEnum.ACCEPT_INVITE)
+  async handleAcceptGame(
+    @MessageBody()
+    data: AcceptInvite,
+    @ConnectedSocket() client: Socket,
+  ) {
+    try {
+      const { receiverId, gameId, selectedNumber } = data;
+      const acceptInvite = await this.inviteService.acceptInvite(
+        receiverId,
+        gameId,
+        selectedNumber,
+      );
+
+      client.emit(
+        GameServiceSocketEnum.GAME_ACCEPTED,
+        JSON.stringify({
+          acceptInvite: acceptInvite,
+        }),
+      );
+    } catch (error) {
+      client.emit(GameServiceSocketEnum.ERROR, error?.message);
+
+      throw new WsException(`MessageServiceGateway.handleAcceptGame, ${error}`);
     }
   }
 }
