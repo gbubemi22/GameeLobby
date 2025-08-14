@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { GameModule } from './game/game.module';
 import { JoingameModule } from './joingame/joingame.module';
 import { SocketEventModule } from './socketEvent/socket.module';
+import { InviteModule } from './invite/invite.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SocketEventModule } from './socketEvent/socket.module';
     GameModule,
     JoingameModule,
     SocketEventModule,
+    InviteModule,
   ],
   controllers: [AppController],
   providers: [AppService],
