@@ -7,6 +7,8 @@ import { Queue, QueueSchema } from 'src/joingame/schema/queue.schema';
 import { JoinGameService } from 'src/joingame/service/joingame.service';
 import { GameServiceGateway } from './game-event/game.event';
 import { User, UserSchema } from 'src/user/schema/user.schema';
+import { Invite, InviteSchema } from 'src/invite/schema/invite.schema';
+import { InviteService } from 'src/invite/service/invite.service';
 
 @Module({
   imports: [
@@ -15,9 +17,10 @@ import { User, UserSchema } from 'src/user/schema/user.schema';
       { name: JoinGame.name, schema: JoinGameSchema },
       { name: Queue.name, schema: QueueSchema },
       { name: User.name, schema: UserSchema },
+      { name: Invite.name, schema: InviteSchema },
     ]),
   ],
 
-  providers: [GameServiceGateway, GameService, JoinGameService],
+  providers: [GameServiceGateway, GameService, JoinGameService, InviteService],
 })
 export class SocketEventModule {}

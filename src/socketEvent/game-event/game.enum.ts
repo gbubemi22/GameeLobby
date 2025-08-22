@@ -9,6 +9,12 @@ export enum GameServiceSocketEnum {
   GAME_JOINED = 'gameJoined',
   LEAVE_GAME = 'leaveGame',
   GAME_LEFT = 'gameLeft',
+  INVITE_GAME = 'inviteGame',
+  GAME_INVITED = 'gameInvited',
+  ACCEPT_INVITE = 'acceptInvite',
+  GAME_ACCEPTED = 'gameAccepted',
+  REJECT_INVITE = 'rejectInvite',
+  GAME_REJECTED = 'gameRejected',
   ERROR = 'error',
 }
 
@@ -30,4 +36,25 @@ export interface LeaveGame {
 
 export interface ListGame {
   sessionId: string;
+}
+
+export interface InviteGame {
+  senderId: string;
+  receiverId: string;
+  gameId: string;
+  note: string;
+}
+
+
+export interface AcceptInvite {
+    receiverId: string,
+    gameId: string,
+    selectedNumber: number,
+  
+}
+
+
+export interface RejectInvite {
+  receiverId: string;
+  gameId: string;
 }
